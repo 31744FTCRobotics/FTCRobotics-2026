@@ -79,3 +79,16 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+# --- Team 31744 additions (see "Git and the FTC SDK" in README.md) ---
+.claude/
+.toolchain-image
+
+# Re-downloaded by `make driver-station`
+apks/
+
+# Hub/Driver Hub snapshots from `make hub-backup` / `make usb-backup`: local only
+hub-backup/
+usb-backup/
+
+# Tracked even if a personal global gitignore excludes *.zip
+!StarterBotWithMecanumsCode.zip

@@ -1,0 +1,11 @@
+# Grant access to any USB device that exposes an adb interface (class ff,
+# subclass 42, protocol 01), such as the REV Control Hub or Driver Hub.
+# Vendor-agnostic, so it also covers phones used as Driver Stations.
+#
+# - uaccess: the user logged in at the desktop
+# - GROUP:   the account the toolchain containers run as, which on a shared or
+#            remote-dev setup may differ from the desktop user
+#
+# Installed on the host by `make udev`, which substitutes @ADB_GROUP@.
+
+ACTION=="add|change", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ENV{ID_USB_INTERFACES}=="*:ff4201:*", MODE="0660", GROUP="@ADB_GROUP@", TAG+="uaccess"

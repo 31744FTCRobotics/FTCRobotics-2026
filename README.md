@@ -189,11 +189,25 @@ image rebuilds only when `toolchain/Dockerfile` changes (`make image` forces it)
 
 #### Deploying over Wi-Fi
 
-`make deploy-wifi` builds first (while you still have internet), then uses
-NetworkManager on the host (over `ssh root@localhost`) to join the robot's
-network (`HUB_SSID`, default `31744-RC`), installs and starts the app over
-wireless adb, and switches back to the Wi-Fi you were on, even if the install
-fails or you press Ctrl-C. Internet (and `wg0`) drop for about 30 s.
+`make deploy-wifi` builds first (while you still have internet), then installs
+and starts the app over wireless adb. `make hub-config` and `make hub-backup`
+reach the hub the same way. How they get onto the robot's network depends on
+the laptop:
+
+- **Second Wi-Fi adapter on the robot's network** (or you joined it by hand):
+  the hub already answers at `192.168.43.1:5555`, so nothing is switched and your
+  internet stays up.
+- **One adapter:** NetworkManager on the host (over `ssh root@localhost`) joins
+  the robot's network (`HUB_SSID`, default `31744-RC`), runs the command, and
+  switches back to the Wi-Fi you were on, even if it fails or you press Ctrl-C.
+  Internet (and `wg0`) drop for about 30 s.
+
+With a second adapter, stop the robot's network from taking over your default
+route and DNS (one-time, on the laptop):
+
+```sh
+nmcli connection modify 31744-RC ipv4.never-default yes ipv4.ignore-auto-dns yes
+```
 
 The robot must be powered on so `31744-RC` is broadcasting. At competitions, use
 the USB cable (`make deploy`) instead: events don't allow extra devices on

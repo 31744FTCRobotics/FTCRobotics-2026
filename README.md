@@ -1,7 +1,8 @@
 # FTC robot code (team 31744)
 
-goBILDA **mecanum** StarterBot (DECODE season; 4 wheels, launcher not installed
-yet) on the FTC Robot Controller SDK v12.0.
+goBILDA **mecanum** StarterBot (DECODE season) with the team's intake and shooter
+(robot configuration `StarterBotMecanumExpanded`), on the FTC Robot Controller
+SDK v12.0.
 
 - **Windows:** use Android Studio; see [Windows (Android Studio)](#windows-android-studio).
 - **Linux:** everything is built and deployed from a headless Docker toolchain
@@ -53,8 +54,9 @@ apks/                 Driver Station APK cache for `make driver-station`
 
 | OpMode | Status |
 |---|---|
-| `StarterBotTeleopMecanums` | **The driver OpMode.** Drives now. Launcher controls switch on automatically once `launcher`, `left_feeder` and `right_feeder` are in the robot configuration. |
+| `StarterBotTeleopMecanums` | goBILDA's mecanum TeleOp: drives. Its launcher controls only switch on if `launcher`, `left_feeder` and `right_feeder` exist; the team's intake and shooter are driven by the Blocks program `Manual 2.0` for now. |
 | `StarterBotAutoMecanums` | **The autonomous.** Back against the goal: fires 3 shots (skipped until the launcher is configured), backs up 4", turns 45° (left on RED, right on BLUE), backs 26" off the line. Press X (BLUE) or B (RED) during INIT. |
+| `DriveOutAndBack` | Test autonomous (group "Test"): drives straight out a distance set with the D-pad during INIT (default 24"), pauses, drives back. Needs the drive encoder cables. |
 | `StarterBotAuto` | goBILDA's original *two-wheel* autonomous, `@Disabled`; kept for reference. |
 
 ### Controls (gamepad 1)
@@ -65,8 +67,8 @@ apks/                 Driver Station APK cache for `make driver-station`
 | Left stick left/right | Strafe |
 | Right stick left/right | Rotate |
 | D-pad up / down | Drive speed limit up / down, in 25% steps from 25% to 100% (starts at 100%; shown in telemetry) |
-| Y / B | Flywheel on / off *(once the launcher is installed)* |
-| Right bumper | Fire one shot *(once the launcher is installed)* |
+| Y / B | goBILDA launcher on / off *(only with a `launcher` configured)* |
+| Right bumper | goBILDA launcher: fire one shot *(only with a `launcher` configured)* |
 
 ## Windows (Android Studio)
 
@@ -117,7 +119,7 @@ that talk to the Control Hub need either its USB cable or the laptop on
 |---|---|
 | `make build` / `make deploy` / `make deploy-wifi` | Android Studio **Run ▶** (see Deploying) |
 | `make deploy-wifi-fresh` | Accept Android Studio's uninstall offer, or `& $adb uninstall com.qualcomm.ftcrobotcontroller` then Run |
-| `make hub-config` | `& $adb push robot-config\StarterBotMecanum.xml /sdcard/FIRST/`, then Activate on the Driver Hub |
+| `make hub-config` | `& $adb push robot-config\StarterBotMecanumExpanded.xml /sdcard/FIRST/`, then Activate on the Driver Hub |
 | `make hub-backup` | `& $adb pull /sdcard/FIRST hub-backup\YYYYMMDD-HHMMSS` (today's date) |
 | `make usb-backup` | Same `adb pull` with only the Driver Hub plugged in |
 | `make driver-station` | REV Hardware Client (update the Driver Hub), or download `FtcDriverStation-release.apk` from the [SDK release](https://github.com/FIRST-Tech-Challenge/FtcRobotController/releases) and `& $adb install -r FtcDriverStation-release.apk` |
@@ -158,14 +160,23 @@ For Wi-Fi deploys, join `31744-RC` by hand once so the laptop saves its password
    ```sh
    make hub-config
    ```
-   Then on the Driver Hub: **⋮ → Configure Robot → StarterBotMecanum → Activate**.
+   Then on the Driver Hub: **⋮ → Configure Robot → StarterBotMecanumExpanded → Activate**.
 
-   | Control Hub port | Name |
-   |---|---|
-   | Motor 0 | `left_front_drive` |
-   | Motor 1 | `left_back_drive` |
-   | Motor 2 | `right_back_drive` |
-   | Motor 3 | `right_front_drive` |
+   | Hub | Port | Name |
+   |---|---|---|
+   | Control Hub | Motor 0 | `frontleftmotor` |
+   | Control Hub | Motor 1 | `backleftmotor` |
+   | Control Hub | Motor 2 | `backrightmotor` |
+   | Control Hub | Motor 3 | `frontrightmotor` |
+   | Control Hub | Servo 0 | `intakeservo` (continuous rotation) |
+   | Control Hub | I2C 0 | `imu` (built-in) |
+   | Expansion Hub 2 | Motor 2 | `intakemotor` |
+   | Expansion Hub 2 | Motor 3 | `shootingmotor` |
+
+   The team also edits this configuration on the Driver Hub. Before running
+   `make hub-config`, run `make hub-backup` and copy any newer
+   `StarterBotMecanumExpanded.xml` into `robot-config/`, or the push will
+   overwrite their changes.
 
 ### Everyday use
 
@@ -274,7 +285,7 @@ Java OpModes; duplicate names conflict.
 | `make blocks` finds the hub but never prints "Editor ready" | The Robot Controller app isn't running: power-cycle the hub. |
 | `adb` shows the device as `no permissions`, or nothing, over USB | Run `make udev`, then unplug and replug. |
 | Deploy fails with `INSTALL_FAILED_UPDATE_INCOMPATIBLE ... signatures do not match` | The hub has a differently-signed Robot Controller (for example after a REV Hardware Client update): `make deploy-wifi-fresh`. |
-| INIT error `Unable to find a hardware device with name "left_front_drive"` | The wrong robot configuration is active: Activate `StarterBotMecanum` on the Driver Hub. |
+| INIT error `Unable to find a hardware device with name "frontleftmotor"` | The wrong robot configuration is active: Activate `StarterBotMecanumExpanded` on the Driver Hub. |
 | Edits made in the Driver Hub's configuration editor don't stick | Press **Done → Save** before leaving the editor. `make hub-config` overwrites same-named configs with `robot-config/`, so update the XML there too. |
 | Autonomous encoders stay at `0` when pushing the robot, or `WARNING: a move timed out` | The drive motors' encoder cables aren't plugged into the Control Hub's encoder ports (next to each motor port). |
 | Driver Hub says "the driver station app is obsolete" | The Driver Hub is on USB: `make driver-station`. |

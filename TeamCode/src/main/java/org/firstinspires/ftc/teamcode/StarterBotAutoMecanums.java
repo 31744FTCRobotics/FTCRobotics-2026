@@ -122,10 +122,10 @@ public class StarterBotAutoMecanums extends OpMode {
 
     @Override
     public void init() {
-        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
-        leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "frontleftmotor");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "frontrightmotor");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "backleftmotor");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "backrightmotor");
 
         /*
          * The launcher isn't built yet, so its devices are optional: tryGet returns null when a

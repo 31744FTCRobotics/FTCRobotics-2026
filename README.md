@@ -100,14 +100,35 @@ It works on the same files: your Java goes in
 
 ### Deploying
 
-- **USB:** plug the Control Hub's USB-C port into the laptop. It appears in the
-  device list at the top of Android Studio; select **TeamCode** and click **Run ▶**.
-- **Wi-Fi:** connect the laptop to `31744-RC`, run `& $adb connect 192.168.43.1:5555`,
-  then **Run ▶** as above. You have no internet while on the robot's network.
-- **First deploy to a hub:** if Android Studio reports that the existing app has a
-  *different signature*, accept its offer to uninstall it (or run
-  `& $adb uninstall com.qualcomm.ftcrobotcontroller`), then Run again. Back up
-  first (below): uninstalling keeps `/sdcard/FIRST`, but it's cheap insurance.
+Android Studio's **Run ▶** button does the whole build-push-run in one step: it
+compiles TeamCode, installs the APK onto the Control Hub, and launches the Robot
+Controller. It just needs to see the hub as a device first.
+
+**Over Wi-Fi** (the usual way — robot powered on, no USB cable):
+
+1. Connect the laptop to the robot's Wi-Fi, `31744-RC`. You have no internet
+   while on this network, so finish any Gradle sync (step 3 of Setup) beforehand.
+2. In Android Studio's **Terminal** tab, connect adb to the hub (once per
+   session, after setting `$adb` as in Setup):
+   ```powershell
+   & $adb connect 192.168.43.1:5555
+   ```
+   It should print `connected to 192.168.43.1:5555`. Confirm with
+   `& $adb devices` — the hub shows as `Control_Hub_v1_0`.
+3. In the toolbar, set the run configuration to **TeamCode** and pick
+   **Control_Hub_v1_0** in the device dropdown next to it. (If it's not listed
+   yet, open the dropdown and give it a second to refresh.)
+4. Click **Run ▶**. When it finishes, the OpModes appear on the Driver Hub.
+
+**Over USB** (e.g. at competitions, where extra devices on robot networks aren't
+allowed): plug the Control Hub's USB-C port into the laptop. It appears in the
+device dropdown directly — no `adb connect` needed — so just do steps 3-4.
+
+**First deploy to a hub:** if Android Studio reports that the existing app has a
+*different signature* (for example after a REV Hardware Client install), accept
+its offer to uninstall it (or run `& $adb uninstall com.qualcomm.ftcrobotcontroller`),
+then Run again. Back up first (below): uninstalling keeps `/sdcard/FIRST`, but
+it's cheap insurance.
 
 ### `make` equivalents
 
